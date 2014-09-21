@@ -17,18 +17,11 @@ server("in.ashwanthkumar.vayu.EchoServer") {
 This should be easier for Server Implementation. How can I wrap the client code? 
 
 ### Taking thrift insipiration
-Take the inspiration from [Thrift IDL](https://thrift.apache.org/docs/idl), [here](https://git-wip-us.apache.org/repos/asf?p=thrift.git;a=blob_plain;f=contrib/fb303/if/fb303.thrift;hb=HEAD), [here](https://git-wip-us.apache.org/repos/asf?p=thrift.git;a=blob_plain;f=test/ThriftTest.thrift;hb=HEAD) and [here](http://svn.apache.org/viewvc/cassandra/trunk/interface/cassandra.thrift?view=co). We can write a simple Thrift service definition parser and generate the server / client stubs. 
+Take the inspiration from [Thrift IDL](https://thrift.apache.org/docs/idl) - [here](https://git-wip-us.apache.org/repos/asf?p=thrift.git;a=blob_plain;f=contrib/fb303/if/fb303.thrift;hb=HEAD), [here](https://git-wip-us.apache.org/repos/asf?p=thrift.git;a=blob_plain;f=test/ThriftTest.thrift;hb=HEAD) and [here](http://svn.apache.org/viewvc/cassandra/trunk/interface/cassandra.thrift?view=co). We can write a simple Thrift service definition parser and generate the server / client stubs. 
 
 ### Thoughts on the Transport
 We might need to use a similar strategy like Thrift to use a constant int value against the service methods. In which case the messages we send / recieve will be similar to the one shown below.
 ```
-// For a service method foo: (String) => (Int)
-
-case class VayuTransportRequest(methodToInvoke: Int, argsToService: String)
-case class VayuTransportResponse(methodInvoked: Int, returnValue: Int)
-
-...
-
 // client usage would be something similar to
 val service = new FooServiceClient("host", "port")
 val result: Future[Int] = service.foo("abcd")
@@ -56,3 +49,27 @@ class FooService {
 val server = new FooService()
 server.startSpin("host", "port")
 ```
+
+#### Transport Messages
+
+For the sample server / client implementations above, I can either use case classes like these for message passing.
+
+```
+// ATTEMPT - 1
+// For a service method foo: (String) => (Int)
+
+case class VayuTransportRequest(methodToInvoke: Int, argsToService: List[Any])
+case class VayuTransportResponse[T](methodInvoked: Int, returnValue: T)
+```
+
+Or may be pre-create transport message for each service method
+
+```
+// ATTEMPT - 2
+// For a service method foo: (String) => (Int)
+
+case class VayuTransportRequest_foo(methodToInvoke: Int, argsToService: String)
+case class VayuTransportResponse_foo(methodInvoked: Int, returnValue: Int)
+```
+
+TODO - Need to understand how Thrift protocol is implemented. Also fiddle around how Avro works.
