@@ -62,7 +62,7 @@ case class VayuTransportRequest(methodToInvoke: Int, argsToService: List[Any])
 case class VayuTransportResponse[T](methodInvoked: Int, returnValue: T)
 ```
 
-Or may be pre-create transport message for each service method
+Or may be pre-create transport message for each service method at stub creation time.
 
 ```
 // ATTEMPT - 2
@@ -72,4 +72,4 @@ case class VayuTransportRequest_foo(methodToInvoke: Int, argsToService: String)
 case class VayuTransportResponse_foo(methodInvoked: Int, returnValue: Int)
 ```
 
-TODO - Need to understand how Thrift protocol is implemented. Also fiddle around how Avro works.
+***TODO*** - Need to understand how Thrift protocol is implemented. Also fiddle around how Avro works.
